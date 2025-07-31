@@ -1,9 +1,10 @@
 import { CountryService } from './../../services/country.service';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, resource, signal } from '@angular/core';
 import { CountryList } from "../../components/country-list/country-list";
 import { SearchInput } from "../../components/search-input/search-input";
 
 import type { Country } from '../../interfaces/country.interface';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-by-capital-page',
@@ -11,24 +12,39 @@ import type { Country } from '../../interfaces/country.interface';
   templateUrl: './by-capital-page.html',
 })
 export class ByCapitalPage {
+  countryServices = inject(CountryService);
+  query = signal('');
 
-  countryServices = inject( CountryService );
+  countryResource = resource({
+    params: () => ({ query: this.query() }),
+    loader: async({ params }) => {
+      if(!params.query) return [];
+      //todo - Esto no permite transformar cualquier observable en una promesa
+      return await firstValueFrom(this.countryServices.buscarPorCapital(params.query));
+    }
+  })
 
-  cargando = signal( false );
-  error = signal<string|null>( null );
-  countries = signal<Country[]>([]);
+  // cargando = signal(false);
+  // error = signal<string | null>(null);
+  // countries = signal<Country[]>([]);
 
-  buscar( query: string){
-    if( this.cargando() ) return; //Si esta en true que no haga nada para evitar enviar un monton de peticiones
+  // buscar(query: string) {
+  //   if (this.cargando()) return; //Si esta en true que no haga nada para evitar enviar un monton de peticiones
 
-    this.cargando.set(true);
-    this.error.set(null); //Estamos limpiando el error en el caso de que lo haya
+  //   this.cargando.set(true);
+  //   this.error.set(null); //Estamos limpiando el error en el caso de que lo haya
 
-    this.countryServices.buscarPorCapital(query)
-    .subscribe((resp) => {
-      this.cargando.set( false ); //Lo establecemos en false xq ya terminamos de cargar la data
-      this.countries.set(resp); // la signal contries contendra la respuesta es decir la data
-    });
-  }
+  //   this.countryServices.buscarPorCapital(query).subscribe({
+  //     next: (countries) => {
+  //       this.cargando.set(false);
+  //       this.countries.set(countries);
+  //     },
 
+  //     error: (err) => {
+  //       this.cargando.set(false);
+  //       this.countries.set([]);
+  //       this.error.set(err);
+  //     },
+  //   });
+  // }
 }
