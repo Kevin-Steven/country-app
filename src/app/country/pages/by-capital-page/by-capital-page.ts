@@ -3,7 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CountryList } from "../../components/country-list/country-list";
 import { SearchInput } from "../../components/search-input/search-input";
 
-import { RESTCountry } from '../../interfaces/rest-countries.interface';
+import type { Country } from '../../interfaces/country.interface';
 
 @Component({
   selector: 'app-by-capital-page',
@@ -16,7 +16,7 @@ export class ByCapitalPage {
 
   cargando = signal( false );
   error = signal<string|null>( null );
-  countries = signal<RESTCountry[]>([]);
+  countries = signal<Country[]>([]);
 
   buscar( query: string){
     if( this.cargando() ) return; //Si esta en true que no haga nada para evitar enviar un monton de peticiones
@@ -28,7 +28,6 @@ export class ByCapitalPage {
     .subscribe((resp) => {
       this.cargando.set( false ); //Lo establecemos en false xq ya terminamos de cargar la data
       this.countries.set(resp); // la signal contries contendra la respuesta es decir la data
-      console.log({resp});
     });
   }
 
