@@ -25,4 +25,18 @@ export class CountryService {
         })
       );
   }
+
+  buscarPorPais(query: string): Observable<Country[]> {
+    const url = `${API_URL}/name/${query}`
+    query = query.toLowerCase();
+    
+    return this.http.get<RESTCountry[]>(url).pipe(
+      map((resp) => CountryMapper.mapRestCountryArrayToCountryArray(resp)),
+      catchError(error => {
+        console.log('Error fetching', error);
+        return throwError(() => new Error(`No se pudo encontrar el país ${query}`));
+      })
+    );
+  }
+  // const url = `${API_URL}/name/${query}`;
 }
