@@ -1,3 +1,9 @@
-<country-search-input placeholder="Buscar por capital"/>
+<country-search-input placeholder="Buscar por capital" (value)="buscar($event)"/>
+<!-- ?? (value)="buscar($event)"  el "value" es el value = output<string>() y lo estamos
+  ?? emitiendo en el html como -> (keyup.enter)="value.emit(txtBuscar.value)"  <-
+  ?? con el $event estamos obteniendo el valor emitido y lo estamos usando en nuestro .ts
+  ?? buscar( query: string){} en este caso el query es el valor emitivo por el $event -->
 
-<country-list />
+<country-list [countries]="countries()"/>
+<!-- TODO: colocamos entre corchetes por que vamos a enviar la data y la data es la signal
+ todo - contries() -->

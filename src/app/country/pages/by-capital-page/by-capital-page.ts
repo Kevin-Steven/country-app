@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import { CountryService } from './../../services/country.service';
+import { Component, inject, signal } from '@angular/core';
 import { CountryList } from "../../components/country-list/country-list";
 import { SearchInput } from "../../components/search-input/search-input";
+
+import { RESTCountry } from '../../interfaces/rest-countries.interface';
 
 @Component({
   selector: 'app-by-capital-page',
@@ -9,8 +12,24 @@ import { SearchInput } from "../../components/search-input/search-input";
 })
 export class ByCapitalPage {
 
-  buscar( value: string ){
-    console.log({value})
+  countryServices = inject( CountryService );
+
+  cargando = signal( false );
+  error = signal<string|null>( null );
+  countries = signal<RESTCountry[]>([]);
+
+  buscar( query: string){
+    if( this.cargando() ) return; //Si esta en true que no haga nada para evitar enviar un monton de peticiones
+
+    this.cargando.set(true);
+    this.error.set(null); //Estamos limpiando el error en el caso de que lo haya
+
+    this.countryServices.buscarPorCapital(query)
+    .subscribe((resp) => {
+      this.cargando.set( false ); //Lo establecemos en false xq ya terminamos de cargar la data
+      this.countries.set(resp); // la signal contries contendra la respuesta es decir la data
+      console.log({resp});
+    });
   }
 
 }
